@@ -78,6 +78,12 @@
     </form>
 
     <script>
+        // Automatically set the date field to today's date
+        document.addEventListener("DOMContentLoaded", () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById("date").value = today;
+        });
+
         document.getElementById("generatePdf").addEventListener("click", fillPDF);
 
         async function fillPDF() {
@@ -94,8 +100,8 @@
                 return;
             }
 
-            // GitHub-hosted PDF
-            const pdfUrl = "https://raw.githubusercontent.com/joecashbuyer/fomrs/main/menu.pdf";
+            // ✅ Try a new working PDF URL (GitHub might block direct access)
+            const pdfUrl = "https://www.dropbox.com/s/yourfileid/menu.pdf?dl=1"; // Change this
 
             try {
                 console.log("Fetching PDF...");
