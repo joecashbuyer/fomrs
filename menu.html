@@ -8,26 +8,32 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
             background-color: #f4f4f4;
+            padding: 20px;
         }
-        form {
-            max-width: 400px;
-            margin: auto;
-            background: #ffffff;
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .form-container, .preview-container {
+            background: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
+        form {
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+        }
         label {
             font-weight: bold;
-            display: block;
             margin-top: 10px;
         }
         input, select, button {
             width: 100%;
-            margin: 10px 0;
+            margin: 5px 0;
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
@@ -46,49 +52,44 @@
     </style>
 </head>
 <body>
-
-    <h2>Fill Out the Form</h2>
-    <form id="pdfForm">
-        <label>Customer Name:</label>
-        <input type="text" id="customerName" required>
-        
-        <label>Producer Name:</label>
-        <input type="text" id="producerName" required>
-        
-        <label>Date:</label>
-        <input type="date" id="date" required>
-
-        <label>Coverage Option:</label>
-        <select id="coverageOption">
-            <option value="10/20K">10/20K</option>
-            <option value="25/50K">25/50K</option>
-            <option value="50/100K">50/100K</option>
-            <option value="100/300K">100/300K</option>
-        </select>
-
-        <label>Deductible:</label>
-        <select id="deductibleOption">
-            <option value="10K">10K</option>
-            <option value="25K">25K</option>
-            <option value="50K">50K</option>
-            <option value="100K">100K</option>
-        </select>
-
-        <button type="button" id="generatePdf">Generate PDF</button>
-    </form>
+    <div class="container">
+        <div class="form-container">
+            <h2>Fill Out the Form</h2>
+            <form id="pdfForm">
+                <label>Customer Name:</label>
+                <input type="text" id="customerName" required>
+                
+                <label>Producer Name:</label>
+                <input type="text" id="producerName" required>
+                
+                <label>Date:</label>
+                <input type="date" id="date" required>
+                
+                <label>Coverage Option:</label>
+                <select id="coverageOption">
+                    <option value="10/20K">10/20K</option>
+                    <option value="25/50K">25/50K</option>
+                    <option value="50/100K">50/100K</option>
+                    <option value="100/300K">100/300K</option>
+                </select>
+                
+                <label>Deductible:</label>
+                <select id="deductibleOption">
+                    <option value="10K">10K</option>
+                    <option value="25K">25K</option>
+                    <option value="50K">50K</option>
+                    <option value="100K">100K</option>
+                </select>
+                
+                <button type="button" id="generatePdf">Generate PDF</button>
+            </form>
+        </div>
+    </div>
 
     <script>
-        // Automatically set the date field to today's date
-        document.addEventListener("DOMContentLoaded", () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById("date").value = today;
-        });
-
         document.getElementById("generatePdf").addEventListener("click", fillPDF);
 
         async function fillPDF() {
-            console.log("Generating PDF...");
-
             const customerName = document.getElementById("customerName").value;
             const producerName = document.getElementById("producerName").value;
             const date = document.getElementById("date").value;
@@ -100,48 +101,36 @@
                 return;
             }
 
-            // ✅ Try a new working PDF URL (GitHub might block direct access)
-            const pdfUrl = "https://www.dropbox.com/s/yourfileid/menu.pdf?dl=1"; // Change this
+            const pdfUrl = "https://raw.githubusercontent.com/joecashbuyer/fomrs/main/menu.pdf";
 
             try {
-                console.log("Fetching PDF...");
                 const response = await fetch(pdfUrl);
                 if (!response.ok) throw new Error("Failed to load PDF");
                 const existingPdfBytes = await response.arrayBuffer();
-
-                // Load the PDF
                 const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
                 const pages = pdfDoc.getPages();
                 const firstPage = pages[0];
-
-                // Set font
                 const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
                 firstPage.setFont(font);
                 firstPage.setFontSize(12);
 
-                // Manually position text
                 firstPage.drawText(`Customer Name: ${customerName}`, { x: 100, y: 500 });
                 firstPage.drawText(`Producer Name: ${producerName}`, { x: 100, y: 480 });
                 firstPage.drawText(`Date: ${date}`, { x: 100, y: 460 });
                 firstPage.drawText(`Coverage: ${coverageOption}`, { x: 100, y: 440 });
                 firstPage.drawText(`Deductible: ${deductibleOption}`, { x: 100, y: 420 });
 
-                // Save the PDF
-                console.log("Saving PDF...");
                 const pdfBytes = await pdfDoc.save();
                 const blob = new Blob([pdfBytes], { type: "application/pdf" });
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = "Filled_Form.pdf";
+                link.download = "Filled_Menu.pdf";
                 link.click();
-
-                console.log("PDF generated successfully!");
             } catch (error) {
                 console.error("Error generating PDF:", error);
                 alert("An error occurred while generating the PDF. Check the console for details.");
             }
         }
     </script>
-
 </body>
 </html>
